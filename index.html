@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Calculadora automática de 10% e 5%.">
+  <title>Calculadora 10% e 5%</title>
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      font-family: Arial, Helvetica, sans-serif;
+      background: #f4f6f5;
+      color: #18352b;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 480px;
+      background: #ffffff;
+      border-radius: 22px;
+      padding: 28px;
+      box-shadow: 0 10px 35px rgba(0, 0, 0, 0.08);
+    }
+
+    h1 {
+      margin: 0;
+      text-align: center;
+      font-size: 26px;
+    }
+
+    .subtitle {
+      text-align: center;
+      margin: 8px 0 24px;
+      color: #65736d;
+      font-size: 15px;
+    }
+
+    label {
+      display: block;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    input {
+      width: 100%;
+      padding: 15px;
+      border: 1px solid #cfd8d4;
+      border-radius: 12px;
+      font-size: 18px;
+      outline: none;
+    }
+
+    input:focus {
+      border-color: #2f7d61;
+      box-shadow: 0 0 0 3px rgba(47, 125, 97, 0.12);
+    }
+
+    .results {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-top: 20px;
+    }
+
+    .result {
+      background: #f5f8f6;
+      border: 1px solid #e0e7e3;
+      border-radius: 14px;
+      padding: 16px;
+    }
+
+    .result span {
+      display: block;
+      color: #65736d;
+      font-size: 14px;
+      margin-bottom: 6px;
+    }
+
+    .result strong {
+      font-size: 20px;
+      overflow-wrap: anywhere;
+    }
+
+    .totals {
+      margin-top: 12px;
+      background: #e8f3ee;
+      border-radius: 14px;
+      padding: 14px 16px;
+    }
+
+    .total-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 7px 0;
+      font-size: 15px;
+    }
+
+    .total-row strong {
+      text-align: right;
+    }
+
+    button {
+      width: 100%;
+      margin-top: 18px;
+      padding: 14px;
+      border: 0;
+      border-radius: 12px;
+      background: #2f7d61;
+      color: #ffffff;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #266950;
+    }
+
+    .footer {
+      text-align: center;
+      color: #8a9691;
+      font-size: 12px;
+      margin-top: 18px;
+    }
+
+    @media (max-width: 480px) {
+      body { padding: 14px; }
+      .container { padding: 22px; }
+      .results { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+
+<body>
+  <main class="container">
+    <h1>Calculadora 10% e 5%</h1>
+    <p class="subtitle">Digite um valor para calcular automaticamente.</p>
+
+    <label for="valor">Valor</label>
+    <input
+      id="valor"
+      type="text"
+      inputmode="decimal"
+      placeholder="Ex.: 1.000,00"
+      autocomplete="off"
+      aria-label="Digite o valor"
+    >
+
+    <section class="results" aria-live="polite">
+      <div class="result">
+        <span>10% do valor</span>
+        <strong id="dezPorcento">R$ 0,00</strong>
+      </div>
+
+      <div class="result">
+        <span>5% do valor</span>
+        <strong id="cincoPorcento">R$ 0,00</strong>
+      </div>
+    </section>
+
+    <section class="totals" aria-live="polite">
+      <div class="total-row">
+        <span>Valor + 10%</span>
+        <strong id="maisDez">R$ 0,00</strong>
+      </div>
+
+      <div class="total-row">
+        <span>Valor + 5%</span>
+        <strong id="maisCinco">R$ 0,00</strong>
+      </div>
+    </section>
+
+    <button type="button" id="limpar">Limpar</button>
+
+    <div class="footer">Calculadora automática</div>
+  </main>
+
+  <script>
+    const valorInput = document.getElementById("valor");
+    const dezPorcento = document.getElementById("dezPorcento");
+    const cincoPorcento = document.getElementById("cincoPorcento");
+    const maisDez = document.getElementById("maisDez");
+    const maisCinco = document.getElementById("maisCinco");
+    const limpar = document.getElementById("limpar");
+
+    const moeda = new Intl.NumberFormat("pt-BR", {
+      style: "currency",
+      currency: "BRL"
+    });
+
+    function converterValor(texto) {
+      let valor = texto.replace(/R\$\s?/g, "").trim();
+
+      if (!valor) return 0;
+
+      if (valor.includes(",")) {
+        valor = valor.replace(/\./g, "").replace(",", ".");
+      }
+
+      valor = valor.replace(/[^0-9.-]/g, "");
+
+      const numero = Number(valor);
+
+      return Number.isFinite(numero) && numero >= 0 ? numero : 0;
+    }
+
+    function calcular() {
+      const valor = converterValor(valorInput.value);
+
+      const dez = valor * 0.10;
+      const cinco = valor * 0.05;
+
+      dezPorcento.textContent = moeda.format(dez);
+      cincoPorcento.textContent = moeda.format(cinco);
+      maisDez.textContent = moeda.format(valor + dez);
+      maisCinco.textContent = moeda.format(valor + cinco);
+    }
+
+    valorInput.addEventListener("input", calcular);
+
+    limpar.addEventListener("click", function () {
+      valorInput.value = "";
+      calcular();
+      valorInput.focus();
+    });
+
+    calcular();
+  </script>
+</body>
+</html>
